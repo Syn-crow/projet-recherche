@@ -12,6 +12,7 @@ import torch.nn.functional as F
 import dataset_discri
 from dataset_discri import BuildingGeneralizationDataset
 
+from PIL import Image
 
 class CNN(nn.Module):
     def __init__(self):
@@ -39,8 +40,8 @@ model = CNN()
 model.load_state_dict(torch.load("21_11_18.pt"))
 model.eval()
 
-batch_size = 100
-dataset2 = BuildingGeneralizationDataset("datasets\\alpe_huez_bati_50k_128")
+dataset2 = BuildingGeneralizationDataset("datasets\\lourdes_bati_50k_128")
+batch_size = 1
 test_loader = torch.utils.data.DataLoader(dataset=dataset2,
                                               batch_size=batch_size,
                                               shuffle=True);
@@ -52,12 +53,17 @@ with torch.no_grad():
     print(str(correct)+"/"+str(total))
 
     for(i, item) in enumerate(test_loader):
-        images = item['image']
-        labels = item['label']
-        outputs = model(images)
-        _, predicted = torch.max(outputs.data, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
-        print(str(correct)+"/"+str(total))
+        
+        try:
+            images = item['image']
+            labels = item['label']
+            outputs = model(images)
+            predicted = torch.argmax(outputs.data, 1)
+            total += labels.size(0)
+            correct += int(torch.eq(predicted, labels)[0])
+            if(i%5==0):
+                print(str(correct)+"/"+str(total))
+        except Exception as e:
+            print(e)
 
-print('Accuracy of the network on the 10000 test images: %d %%'%(100 * correct / total))
+print('Accuracy of the network on the {} test images: {}'.format(total,100 * correct / total))

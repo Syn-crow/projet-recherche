@@ -17,7 +17,7 @@ plt.ion()   # interactive mode
 class BuildingGeneralizationDataset(Dataset):
     """building with/without generalization dataset."""
 
-    def __init__(self, root_dir, transform=None):
+    def __init__(self, root_dir, transform=transforms.functional.to_tensor):
         """
          Args:
            root_dir: chemin vers le dossier avec les images
@@ -34,9 +34,9 @@ class BuildingGeneralizationDataset(Dataset):
         path = self.root
         entrePath = os.path.join(path,self.inputName.format(index))
         sortiePath = os.path.join(path,self.inputName.format(index))
-        sample = (Image.open(entrePath) , Image.open(sortiePath))
+        sample = {"entre":Image.open(entrePath) , "sortie": Image.open(sortiePath)}
         if self.transform:
-            sample = self.transform(sample)
+            sample = {"entre":self.transform(sample["entre"]),"sortie":self.transform(sample["sortie"])}
 
         return sample
         
@@ -45,5 +45,5 @@ class BuildingGeneralizationDataset(Dataset):
 if __name__ == '__main__':
     dataset = BuildingGeneralizationDataset("datasets\\alpe_huez_bati_50k_128")
     print(len(dataset))
-    dataset[4]["entre"].show()
+    Image.fromarray(dataset[0]["entre"].numpy()).show()
     print(dataset[4]["sortie"].size)

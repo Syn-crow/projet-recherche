@@ -12,6 +12,7 @@ import torch.nn.functional as F
 import dataset_discri
 from dataset_discri import BuildingGeneralizationDataset 
 
+import datetime
 
 class CNN(nn.Module):
     def __init__(self):
@@ -35,7 +36,7 @@ class CNN(nn.Module):
         out = self.fc(out)
         return out
 if __name__ == '__main__':
-    num_epochs = 2;
+    num_epochs = 5;
     batch_size = 100;
     learning_rate = 0.001;
 
@@ -84,7 +85,8 @@ if __name__ == '__main__':
     cnn.eval()
     correct = 0
     total = 0
-    torch.save(cnn.state_dict(), "21_11_18.pt")
+    now = datetime.datetime.now()
+    torch.save(cnn.state_dict(), "{}_{}_{}__{}_{}".format(now.day,now.month,now.year,now.hour,now.minute)+".pt")
     print("saved")
     for(i, item) in enumerate(train_loader):
         images = item['image']
